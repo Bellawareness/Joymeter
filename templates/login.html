@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joymeter - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* Scroll animation */
+        @keyframes scroll {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(-100%);
+            }
+        }
+
+        .animate-scroll {
+            animation: scroll 20s linear infinite; /* Slower scrolling for better readability */
+        }
+
+        /* Torn paper effect for moments */
+        .shred-paper {
+            background: #fff; /* White background for paper */
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            border: 1px solid #ddd; /* Light border */
+            position: relative;
+            font-family: 'Courier New', Courier, monospace; /* Handwritten-like font */
+            background-image: linear-gradient(135deg, #fdfdfd 25%, #f7f7f7 25%, #f7f7f7 50%, #fdfdfd 50%, #fdfdfd 75%, #f7f7f7 75%, #f7f7f7 100%);
+            background-size: 20px 20px; /* Subtle paper texture */
+        }
+
+        .shred-paper::before,
+        .shred-paper::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 10px;
+            background: #fce4d6; /* Match the background color */
+            left: 0;
+        }
+
+        .shred-paper::before {
+            top: -10px;
+            clip-path: polygon(0 0, 10% 100%, 20% 0, 30% 100%, 40% 0, 50% 100%, 60% 0, 70% 100%, 80% 0, 90% 100%, 100% 0);
+        }
+
+        .shred-paper::after {
+            bottom: -10px;
+            clip-path: polygon(0 100%, 10% 0, 20% 100%, 30% 0, 40% 100%, 50% 0, 60% 100%, 70% 0, 80% 100%, 90% 0, 100% 100%);
+        }
+    </style>
+</head>
+
+<body class="font-sans">
+
+    <!-- Header Section -->
+    <header class="header-glass text-center py-6">
+        <h1 class="text-4xl font-bold text-white">Joymeter</h1>
+        <p class="mt-2 text-lg px-4 text-gray-100">
+            Log in to track your happiest moments and rediscover your joy.
+        </p>
+    </header>
+
+    <!-- Main Section -->
+    <div class="flex justify-center items-center min-h-screen px-4">
+        <div class="flex flex-wrap lg:flex-nowrap gap-8 w-full max-w-6xl">
+            <!-- Glass-Like Login Card -->
+            <div class="glass-card w-full lg:w-1/2 p-8 space-y-6">
+                <!-- Header -->
+                <h1 class="text-3xl font-bold text-center text-pink-600">Keep Account of your Joys!</h1>
+
+                <!-- Introduction -->
+                <p class="text-center text-lg text-gray-700">
+                    Joymeter is a simple way to track your joyful moments.
+                    Start by signing up or log in, and begin tracking your daily joys!
+                </p>
+
+                <!-- Login Form -->
+                <form method="POST" class="space-y-4">
+                    <div>
+                        <label for="username" class="block text-lg font-medium text-gray-800">Username</label>
+                        <input type="text" id="username" name="username" required class="w-full p-3 border border-gray-300 rounded-md" placeholder="Enter your username">
+                    </div>
+                    <div>
+                        <label for="password" class="block text-lg font-medium text-gray-800">Password</label>
+                        <input type="password" id="password" name="password" required class="w-full p-3 border border-gray-300 rounded-md" placeholder="Enter your password">
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="w-full bg-pink-600 text-white py-3 rounded-lg bloom-button">
+                            Login
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Register Link -->
+                <p class="text-center text-lg text-gray-700 mt-4">
+                    <a href="{{ url_for('register') }}" class="text-pink-600 hover:text-pink-700">Don't have an account? Register here</a>
+                </p>
+            </div>
+
+            <!-- Shared Joyful Moments -->
+            <div class="glass-card w-full lg:w-1/2 p-8 space-y-6">
+                <h2 class="text-2xl font-semibold text-gray-800 text-center">Shared Joyful Moments</h2>
+                <div class="overflow-hidden relative h-64">
+                    <ul id="joy-moments" class="space-y-4 absolute inset-0 animate-scroll">
+                        <li class="shred-paper">
+                            <p><strong>Moment of Joy:</strong> I realized how long my hair has gotten, the embodiment of my childhood fantasies of Bollywood stars.</p>
+                        </li>
+                        <li class="shred-paper">
+                            <p><strong>Moment of Joy:</strong> I got a surprise gift from my sister that really made me smile.</p>
+                        </li>
+                        <li class="shred-paper">
+                            <p><strong>Moment of Joy:</strong> I saw a double rainbow after a rainy day, and it made me feel so lucky.</p>
+                        </li>
+                        <li class="shred-paper">
+                            <p><strong>Moment of Joy:</strong> My best friend surprised me with a handwritten letter that brought tears to my eyes.</p>
+                        </li>
+                        <li class="shred-paper">
+                            <p><strong>Moment of Joy:</strong> I baked cookies with my grandma, and the kitchen smelled like pure happiness.</p>
+                        </li>
+                        <li class="shred-paper">
+                            <p><strong>Moment of Joy:</strong> I found an old photo album and spent hours reminiscing about childhood memories.</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="grass">
+        <p class="text-sm font-semibold text-green-900">&copy; 2025 Joymeter - Rediscover Your Happiness!</p>
+    </footer>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div>
+          {% for category, message in messages %}
+            <div class="mb-4 p-3 rounded {{ 'bg-green-100 text-green-800' if category == 'success' else 'bg-red-100 text-red-800' }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+</body>
+
+</html>

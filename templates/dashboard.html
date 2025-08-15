@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Joymeter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* Scroll animation for joy moments */
+        @keyframes scroll {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(-100%);
+            }
+        }
+
+        .animate-scroll {
+            animation: scroll 30s linear infinite; /* Slower scrolling */
+        }
+
+        /* Peach background */
+        body {
+            background-color: #FCE4D6; /* Soft peach background */
+        }
+
+        .jar-container {
+            position: relative;
+            width: 150px;
+            height: 300px;
+            border: 5px solid rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            margin: 0 auto;
+        }
+
+        .jar-fill {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 0;
+            background: linear-gradient(to top, #A8E6A1, #FCE4D6);
+            transition: height 0.5s ease-in-out;
+        }
+
+        /* Subtle button animation */
+        .bloom-button {
+            transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+        }
+
+        .bloom-button:hover {
+            transform: scale(1.05); /* Slightly enlarge the button */
+            background-color: #9AE6B4; /* Lighter green on hover */
+        }
+
+        /* Motivational quote styling */
+        .motivational-quote {
+            margin-top: 1rem;
+            font-size: 1.25rem;
+            font-style: italic;
+            color: #4A5568; /* Gray-700 */
+            text-align: center;
+        }
+
+        /* Transparent glass-like card styling */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.15); /* More transparent */
+            backdrop-filter: blur(15px); /* Stronger blur effect */
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+
+        .section-spacing {
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+
+<body class="font-sans">
+
+    <!-- Header Section -->
+    <header class="header-glass text-center py-6 mb-8">
+        <h1 class="text-4xl font-bold text-white">Joymeter Dashboard</h1>
+        <p class="mt-2 text-lg px-4 text-gray-100">
+            Track your happy moments and rediscover your joy.
+        </p>
+        <!-- Logout Link -->
+        <div class="mt-4">
+            <a href="{{ url_for('logout') }}" class="text-pink-600 hover:text-pink-700 text-lg font-semibold">
+                Logout
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Section -->
+    <div class="container mx-auto px-4 space-y-8">
+        <!-- Joy Jar and Form Section -->
+        <div class="glass-card flex flex-wrap lg:flex-nowrap items-center gap-8 section-spacing">
+            <!-- Joy Jar -->
+            <div class="text-center flex-1">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Your Joy Jar</h2>
+                <div class="jar-container">
+                    <div class="jar-fill" id="jar-fill" style="height: 0%;"></div>
+                </div>
+            </div>
+
+            <!-- Add Joy Moment Form -->
+            <div class="flex-1">
+                <h1 class="text-3xl font-bold text-center text-pink-600 mb-6">Your Daily Joy Jar</h1>
+                <form id="joy-form" onsubmit="handleFormSubmit(event)">
+                    <div class="space-y-6">
+                        <div>
+                            <label for="description" class="block text-lg font-medium text-gray-800">Description</label>
+                            <textarea name="description" id="description" required class="w-full p-3 border border-gray-300 rounded-md" placeholder="Describe your moment of joy..."></textarea>
+                        </div>
+
+                        <div>
+                            <label for="joy_level" class="block text-lg font-medium text-gray-800">Joy Level</label>
+                            <input type="range" id="joy_level" name="joy_level" min="1" max="10" value="5" step="1" class="w-full mt-2" oninput="updateSliderValue(this)">
+                            <div class="mt-2 text-center text-xl font-semibold" id="slider-description">5 - Neutral</div>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="w-full bg-pink-600 text-white py-3 rounded-lg bloom-button">
+                                Add Joy Moment
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Motivational Quote -->
+                <div id="motivational-quote" class="motivational-quote"></div>
+            </div>
+        </div>
+
+        <!-- Joyful Moments Section -->
+        <div class="glass-card section-spacing">
+            <h2 class="text-2xl font-semibold text-gray-800 text-center mb-4">Your Joyful Moments</h2>
+            <div class="overflow-y-auto h-64"> <!-- Changed from overflow-hidden/relative to scrollable -->
+                <ul id="joy-list" class="space-y-4">
+                    <!-- Joy moments will be dynamically added here -->
+                </ul>
+            </div>
+        </div>
+
+    
+
+        <!-- Your Joy Progress Section -->
+        <div class="glass-card section-spacing">
+            <h2 class="text-2xl font-semibold text-gray-800 text-center mb-4">Your Joy Progress</h2>
+            <div class="flex justify-center">
+                <canvas id="joyProgressChart" style="max-width: 900px; width: 100%;"></canvas>
+            </div>
+            <div class="flex justify-center gap-4 mt-4">
+                <button onclick="setChartPeriod('daily')" class="bloom-button">Daily</button>
+                <button onclick="setChartPeriod('weekly')" class="bloom-button">Weekly</button>
+                <button onclick="setChartPeriod('monthly')" class="bloom-button">Monthly</button>
+            </div>
+        </div>
+
+    <!-- Footer Section -->
+    <footer class="grass">
+        <p class="text-sm font-semibold text-green-900">&copy; 2025 Joymeter - Rediscover Your Happiness!</p>
+    </footer>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div>
+          {% for category, message in messages %}
+            <div class="mb-4 p-3 rounded {{ 'bg-green-100 text-green-800' if category == 'success' else 'bg-red-100 text-red-800' }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <script>
+const MAX_JOY_LEVEL = 100;
+const joyLevels = [
+    "Very Bad", "Bad", "Eh", "Ok", "Neutral",
+    "Happy", "Very Happy", "Ecstatic", "Overjoyed", "Blissed Out"
+];
+
+function updateSliderValue(slider) {
+    const value = slider.value;
+    document.getElementById('slider-description').textContent = `${value} - ${joyLevels[value - 1]}`;
+}
+
+function handleFormSubmit(event) {
+    event.preventDefault();
+    const description = document.getElementById('description').value.trim();
+    const joyLevel = parseInt(document.getElementById('joy_level').value);
+
+    if (!description) {
+        alert("Please enter a description for your joy moment.");
+        return;
+    }
+
+    fetch('/api/joy_moments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description, joyLevel })
+    })
+    .then(response => response.json())
+    .then(data => { // <-- FIXED SYNTAX
+        if (data.success) {
+            loadJoyMoments(); // Refresh the list
+            fetchQuote();     // Show a new quote
+        }
+    });
+
+    document.getElementById('joy-form').reset();
+    updateSliderValue(document.getElementById('joy_level'));
+}
+
+function updateJarFill(totalJoy) {
+    const jarFill = document.getElementById('jar-fill');
+    const jarHeight = Math.min((totalJoy / MAX_JOY_LEVEL) * 100, 100);
+    jarFill.style.height = `${jarHeight}%`;
+}
+
+function addJoyMomentToList(description, joyLevel, timestamp) {
+    const joyList = document.getElementById('joy-list');
+    const listItem = document.createElement('li');
+    listItem.className = 'bg-pink-50 p-4 rounded-lg shadow-md';
+    const timeString = timestamp ? new Date(timestamp).toLocaleString() : '';
+    listItem.innerHTML = `<p><strong>Description:</strong> ${description}</p>
+                          <p><strong>Joy Level:</strong> ${joyLevel} - ${joyLevels[joyLevel - 1]}</p>
+                          <p><strong>Time:</strong> ${timeString}</p>`;
+    joyList.appendChild(listItem);
+}
+
+function groupJoyData(moments) {
+    // Helper to group by date, week, month
+    const daily = {};
+    const weekly = {};
+    const monthly = {};
+
+    moments.forEach(m => {
+        const dateObj = new Date(m.timestamp);
+        // Daily
+        const day = dateObj.toLocaleDateString();
+        daily[day] = daily[day] || { count: 0, totalLevel: 0 };
+        daily[day].count += 1;
+        daily[day].totalLevel += m.joyLevel;
+
+        // Weekly (ISO week)
+        const week = `${dateObj.getFullYear()}-W${getWeekNumber(dateObj)}`;
+        weekly[week] = weekly[week] || { count: 0, totalLevel: 0 };
+        weekly[week].count += 1;
+        weekly[week].totalLevel += m.joyLevel;
+
+        // Monthly
+        const month = `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2, '0')}`;
+        monthly[month] = monthly[month] || { count: 0, totalLevel: 0 };
+        monthly[month].count += 1;
+        monthly[month].totalLevel += m.joyLevel;
+    });
+
+    return { daily, weekly, monthly };
+}
+
+function getWeekNumber(d) {
+    // ISO week number
+    d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getFullYear(),0,1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
+}
+
+function renderCharts(moments) {
+    const { daily, weekly, monthly } = groupJoyData(moments);
+
+    // Helper to build chart data
+    function buildChartData(dataObj) {
+        const labels = Object.keys(dataObj);
+        const counts = labels.map(label => dataObj[label].count);
+        const avgs = labels.map(label => (dataObj[label].totalLevel / dataObj[label].count).toFixed(2));
+        return { labels, counts, avgs };
+    }
+
+    // Destroy previous charts if they exist
+    if (window.dailyChartInstance) window.dailyChartInstance.destroy();
+    if (window.weeklyChartInstance) window.weeklyChartInstance.destroy();
+    if (window.monthlyChartInstance) window.monthlyChartInstance.destroy();
+
+    // Daily Chart
+    const dailyData = buildChartData(daily);
+    window.dailyChartInstance = new Chart(document.getElementById('dailyChart'), {
+        type: 'bar',
+        data: {
+            labels: dailyData.labels,
+            datasets: [
+                {
+                    label: 'Joy Moments',
+                    data: dailyData.counts,
+                    backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2,
+                    yAxisID: 'y',
+                },
+                {
+                    label: 'Avg Joy Level',
+                    data: dailyData.avgs,
+                    type: 'line',
+                    fill: false,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            animation: { duration: 1200 },
+            plugins: {
+                legend: { display: true },
+                tooltip: { enabled: true }
+            },
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Joy Moments' } },
+                y1: { beginAtZero: true, position: 'right', title: { display: true, text: 'Avg Joy Level' }, min: 1, max: 10 }
+            }
+        }
+    });
+
+    // Weekly Chart
+    const weeklyData = buildChartData(weekly);
+    window.weeklyChartInstance = new Chart(document.getElementById('weeklyChart'), {
+        type: 'bar',
+        data: {
+            labels: weeklyData.labels,
+            datasets: [
+                {
+                    label: 'Joy Moments',
+                    data: weeklyData.counts,
+                    backgroundColor: 'rgba(255, 206, 86, 0.7)',
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    borderWidth: 2,
+                    yAxisID: 'y',
+                },
+                {
+                    label: 'Avg Joy Level',
+                    data: weeklyData.avgs,
+                    type: 'line',
+                    fill: false,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            animation: { duration: 1200 },
+            plugins: {
+                legend: { display: true },
+                tooltip: { enabled: true }
+            },
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Joy Moments' } },
+                y1: { beginAtZero: true, position: 'right', title: { display: true, text: 'Avg Joy Level' }, min: 1, max: 10 }
+            }
+        }
+    });
+
+    // Monthly Chart
+    const monthlyData = buildChartData(monthly);
+    window.monthlyChartInstance = new Chart(document.getElementById('monthlyChart'), {
+        type: 'bar',
+        data: {
+            labels: monthlyData.labels,
+            datasets: [
+                {
+                    label: 'Joy Moments',
+                    data: monthlyData.counts,
+                    backgroundColor: 'rgba(153, 102, 255, 0.7)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    borderWidth: 2,
+                    yAxisID: 'y',
+                },
+                {
+                    label: 'Avg Joy Level',
+                    data: monthlyData.avgs,
+                    type: 'line',
+                    fill: false,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            animation: { duration: 1200 },
+            plugins: {
+                legend: { display: true },
+                tooltip: { enabled: true }
+            },
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Joy Moments' } },
+                y1: { beginAtZero: true, position: 'right', title: { display: true, text: 'Avg Joy Level' }, min: 1, max: 10 }
+            }
+        }
+    });
+}
+
+let chartPeriod = 'daily';
+let chartInstance = null;
+let chartDataCache = null;
+
+function setChartPeriod(period) {
+    chartPeriod = period;
+    if (chartDataCache) {
+        renderJoyProgressChart(chartDataCache);
+    }
+}
+
+function renderJoyProgressChart(moments) {
+    const { daily, weekly, monthly } = groupJoyData(moments);
+
+    let dataObj;
+    let periodLabel;
+    if (chartPeriod === 'daily') {
+        dataObj = daily;
+        periodLabel = 'Day';
+    } else if (chartPeriod === 'weekly') {
+        dataObj = weekly;
+        periodLabel = 'Week';
+    } else {
+        dataObj = monthly;
+        periodLabel = 'Month';
+    }
+
+    const labels = Object.keys(dataObj);
+    const counts = labels.map(label => dataObj[label].count);
+    const avgs = labels.map(label => (dataObj[label].totalLevel / dataObj[label].count).toFixed(2));
+
+    // Destroy previous chart
+    if (chartInstance) chartInstance.destroy();
+
+    chartInstance = new Chart(document.getElementById('joyProgressChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Joy Moments',
+                    data: counts,
+                    backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2,
+                    yAxisID: 'y',
+                },
+                {
+                    label: 'Avg Joy Level',
+                    data: avgs,
+                    type: 'line',
+                    fill: false,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            animation: { duration: 1200 },
+            plugins: {
+                legend: { display: true },
+                tooltip: { enabled: true }
+            },
+            scales: {
+                x: { title: { display: true, text: periodLabel } },
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'Joy Moments' },
+                    suggestedMax: Math.max(...counts) < 5 ? 5 : undefined // auto-scale, but minimum 5 for visibility
+                },
+                y1: {
+                    beginAtZero: true,
+                    position: 'right',
+                    title: { display: true, text: 'Avg Joy Level' },
+                    min: 1,
+                    max: 10
+                }
+            }
+        }
+    });
+}
+
+// Update loadJoyMoments to cache data and render combined chart
+function loadJoyMoments() {
+    fetch('/api/joy_moments')
+      .then(response => response.json())
+      .then(moments => {
+          chartDataCache = moments;
+          const joyList = document.getElementById('joy-list');
+          joyList.innerHTML = "";
+          let totalJoy = 0;
+          moments.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+          moments.forEach(moment => {
+              addJoyMomentToList(moment.description, moment.joyLevel, moment.timestamp);
+              totalJoy += moment.joyLevel;
+          });
+          updateJarFill(totalJoy);
+          renderJoyProgressChart(moments);
+      });
+}
+
+function fetchQuote() {
+    const quotes = [
+        "Be here now. — Ram Dass",
+        "The present moment is filled with joy and happiness. — Thich Nhat Hanh",
+        "Wherever you are, be all there. — Jim Elliot",
+        "Happiness is not something you postpone for the future; it is something you design for the present. — Jim Rohn",
+        "The only time we ever have is now. — Jon Kabat-Zinn"
+    ];
+    const randomIndex = Math.floor(Math.random() * quotes.length);
+    document.getElementById('motivational-quote').textContent = quotes[randomIndex];
+}
+
+window.onload = function () {
+    loadJoyMoments();
+    fetchQuote();
+};
+</script>
+
+</body>
+
+</html>

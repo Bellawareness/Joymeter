@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Feedback - Joymeter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body class="flex flex-col justify-between min-h-screen text-gray-700 font-sans">
+
+    <!-- Header Section -->
+    <header class="header-glass text-center py-6">
+        <h1 class="text-4xl font-bold text-white">Joymeter</h1>
+        <p class="mt-2 text-lg px-4 text-gray-100">
+            We value your feedback!
+        </p>
+        <nav class="mt-4">
+            <a href="{{ url_for('home') }}" class="text-white hover:text-gray-200 mx-4">Home</a>
+            <a href="{{ url_for('about') }}" class="text-white hover:text-gray-200 mx-4">About</a>
+        </nav>
+    </header>
+
+    <!-- Main Section -->
+    <main class="glass-section flex-1 mx-auto max-w-4xl p-6 mt-6">
+        <h2 class="text-3xl font-semibold text-pink-600 mb-6 text-center">We'd love to hear from you!</h2>
+        <form method="POST" action="https://formspree.io/f/xdkevzpd" class="space-y-6">
+            <!-- Ease of Use -->
+            <div>
+                <label for="ease_of_use" class="block text-lg font-medium text-gray-800">How easy is the app to use?</label>
+                <select id="ease_of_use" name="ease_of_use" required class="w-full p-3 border border-gray-300 rounded-md">
+                    <option value="" disabled selected>Select an option</option>
+                    <option value="Very Easy">Very Easy</option>
+                    <option value="Easy">Easy</option>
+                    <option value="Neutral">Neutral</option>
+                    <option value="Difficult">Difficult</option>
+                    <option value="Very Difficult">Very Difficult</option>
+                </select>
+            </div>
+
+            <!-- Suggestions for Improvement -->
+            <div>
+                <label for="improvements" class="block text-lg font-medium text-gray-800">What can we improve?</label>
+                <textarea id="improvements" name="improvements" rows="4" 
+                          class="w-full p-3 border border-gray-300 rounded-md" 
+                          placeholder="Share your suggestions..."></textarea>
+            </div>
+
+            <!-- Encouragement to Use -->
+            <div>
+                <label for="encouragement" class="block text-lg font-medium text-gray-800">What would encourage you to use the app more?</label>
+                <textarea id="encouragement" name="encouragement" rows="4" 
+                          class="w-full p-3 border border-gray-300 rounded-md" 
+                          placeholder="Share your thoughts..."></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+                <button type="submit" 
+                        class="bloom-button bg-green-400 text-white py-3 px-8 rounded-lg hover:bg-green-500 transition duration-300">
+                    Submit Feedback
+                </button>
+            </div>
+        </form>
+    </main>
+
+    <!-- Grass Footer -->
+    <footer class="grass">
+        <p class="text-sm font-semibold text-green-900">&copy; 2025 Joymeter - Rediscover Your Happiness!</p>
+    </footer>
+
+</body>
+
+</html>

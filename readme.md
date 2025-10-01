@@ -64,8 +64,8 @@ Joy Tracker is a web application designed to help you log, reflect on, and celeb
 
 3. **Open your browser and go to:**
     ```
-    http://127.0.0.1:5000/
-    ```
+    python3.8 -m venv venv
+    source venv/bin/activate    ```
 
 ## Usage
 

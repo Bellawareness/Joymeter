@@ -71,19 +71,16 @@ class JoyTracker:
 
     def generate_weekly_summary(self):
         today = datetime.now()
-        start_date = (today - timedelta(days=today.weekday())).strftime("%Y-%m-%d")  # Monday of the current week
-        end_date = (today + timedelta(days=(6 - today.weekday()))).strftime("%Y-%m-%d")  # Sunday of the current week
-        
+        start_date = (today - timedelta(days=today.weekday())).strftime("%Y-%m-%d")
+        end_date = (today + timedelta(days=(6 - today.weekday()))).strftime("%Y-%m-%d")
         conn = sqlite3.connect("joy_tracker.db")
         cursor = conn.cursor()
         cursor.execute("""
-        SELECT description, joy_level, date FROM joy_moments
-        WHERE user_id = ? AND date BETWEEN ? AND ?
+        SELECT description, joy_level, timestamp FROM joy_moments
+        WHERE user_id = ? AND date(timestamp) BETWEEN ? AND ?
         """, (self.user_id, start_date, end_date))
-        
         joy_moments = cursor.fetchall()
         conn.close()
-
         print(f"Weekly Summary from {start_date} to {end_date}:")
         for moment in joy_moments:
             print(f"Date: {moment[2]}, Joy Level: {moment[1]}, Description: {moment[0]}")
@@ -91,20 +88,16 @@ class JoyTracker:
     def generate_monthly_trend(self):
         today = datetime.now()
         first_day_of_month = today.replace(day=1).strftime("%Y-%m-%d")
-        
         conn = sqlite3.connect("joy_tracker.db")
         cursor = conn.cursor()
         cursor.execute("""
-        SELECT date, joy_level FROM joy_moments
-        WHERE user_id = ? AND date >= ?
+        SELECT timestamp, joy_level FROM joy_moments
+        WHERE user_id = ? AND date(timestamp) >= ?
         """, (self.user_id, first_day_of_month))
-        
         joy_moments = cursor.fetchall()
         conn.close()
-
         joy_levels = [moment[1] for moment in joy_moments]
         dates = [moment[0] for moment in joy_moments]
-        
         if joy_levels:
             print(f"Monthly Trend for the month starting {first_day_of_month}:")
             for date, level in zip(dates, joy_levels):
@@ -115,20 +108,16 @@ class JoyTracker:
     def plot_monthly_trend(self):
         today = datetime.now()
         first_day_of_month = today.replace(day=1).strftime("%Y-%m-%d")
-        
         conn = sqlite3.connect("joy_tracker.db")
         cursor = conn.cursor()
         cursor.execute("""
-        SELECT date, joy_level FROM joy_moments
-        WHERE user_id = ? AND date >= ?
+        SELECT timestamp, joy_level FROM joy_moments
+        WHERE user_id = ? AND date(timestamp) >= ?
         """, (self.user_id, first_day_of_month))
-        
         joy_moments = cursor.fetchall()
         conn.close()
-
         joy_levels = [moment[1] for moment in joy_moments]
         dates = [moment[0] for moment in joy_moments]
-
         if joy_levels:
             plt.plot(dates, joy_levels)
             plt.title("Monthly Joy Trend")

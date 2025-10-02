@@ -61,6 +61,7 @@ Joy Tracker is a web application designed to help you log, reflect on, and celeb
     ```bash
     flask run
     ```
+    python3 app.py
 
 3. **Open your browser and go to:**
     ```

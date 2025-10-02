@@ -6,80 +6,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Joymeter</title>
     <script src="https://cdn.tailwindcss.com"></script>
-   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
-        /* Scroll animation for joy moments */
         @keyframes scroll {
-            0% {
-                transform: translateY(0);
-            }
-            100% {
-                transform: translateY(-100%);
-            }
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-100%); }
         }
-
-        .animate-scroll {
-            animation: scroll 30s linear infinite; /* Slower scrolling */
-        }
-
-        /* Peach background */
-        body {
-            background-color: #FCE4D6; /* Soft peach background */
-        }
-
+        .animate-scroll { animation: scroll 30s linear infinite; }
+        body { background-color: #FCE4D6; }
         .jar-container {
-            position: relative;
-            width: 150px;
-            height: 300px;
-            border: 5px solid rgba(255, 255, 255, 0.5);
-            border-radius: 10px;
-            overflow: hidden;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            margin: 0 auto;
+            position: relative; width: 150px; height: 300px;
+            border: 5px solid rgba(255,255,255,0.5); border-radius: 10px;
+            overflow: hidden; background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px); margin: 0 auto;
         }
-
         .jar-fill {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 0;
+            position: absolute; bottom: 0; width: 100%; height: 0;
             background: linear-gradient(to top, #A8E6A1, #FCE4D6);
             transition: height 0.5s ease-in-out;
         }
-
-        /* Subtle button animation */
         .bloom-button {
-            transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+            transition: transform 0.2s, background-color 0.2s;
         }
-
         .bloom-button:hover {
-            transform: scale(1.05); /* Slightly enlarge the button */
-            background-color: #9AE6B4; /* Lighter green on hover */
+            transform: scale(1.05); background-color: #9AE6B4;
         }
-
-        /* Motivational quote styling */
         .motivational-quote {
-            margin-top: 1rem;
-            font-size: 1.25rem;
-            font-style: italic;
-            color: #4A5568; /* Gray-700 */
-            text-align: center;
+            margin-top: 1rem; font-size: 1.25rem; font-style: italic;
+            color: #4A5568; text-align: center;
         }
-
-        /* Transparent glass-like card styling */
         .glass-card {
-            background: rgba(255, 255, 255, 0.15); /* More transparent */
-            backdrop-filter: blur(15px); /* Stronger blur effect */
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(15px);
+            border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 2rem;
         }
-
-        .section-spacing {
-            margin-bottom: 2rem;
-        }
+        .section-spacing { margin-bottom: 2rem; }
     </style>
 </head>
 
@@ -87,7 +48,7 @@
 
     <!-- Header Section -->
     <header class="header-glass text-center py-6 mb-8">
-             <nav class="absolute top-4 right-8 flex gap-2">
+        <nav class="absolute top-4 right-8 flex gap-2">
             <a href="{{ url_for('about') }}"
                class="vintage-btn bg-opacity-70 backdrop-blur-md text-brown-900 border border-brown-300 px-4 py-1 rounded-md shadow hover:bg-brown-200 transition duration-200"
                style="background: rgba(231,211,183,0.7); color: #A0522D; border-color: #BCA177;">
@@ -103,7 +64,6 @@
         <p class="mt-2 text-lg px-4 text-gray-100">
             Track your happy moments and rediscover your joy.
         </p>
-        <!-- Logout Link -->
         <div class="mt-4">
             <a href="{{ url_for('logout') }}" class="text-pink-600 hover:text-pink-700 text-lg font-semibold">
                 Logout
@@ -122,7 +82,6 @@
                     <div class="jar-fill" id="jar-fill" style="height: 0%;"></div>
                 </div>
             </div>
-
             <!-- Add Joy Moment Form -->
             <div class="flex-1">
                 <h1 class="text-3xl font-bold text-center text-pink-600 mb-6">Your Daily Joy Jar</h1>
@@ -132,13 +91,11 @@
                             <label for="description" class="block text-lg font-medium text-gray-800">Description</label>
                             <textarea name="description" id="description" required class="w-full p-3 border border-gray-300 rounded-md" placeholder="Describe your moment of joy..."></textarea>
                         </div>
-
                         <div>
                             <label for="joy_level" class="block text-lg font-medium text-gray-800">Joy Level</label>
                             <input type="range" id="joy_level" name="joy_level" min="1" max="10" value="5" step="1" class="w-full mt-2" oninput="updateSliderValue(this)">
                             <div class="mt-2 text-center text-xl font-semibold" id="slider-description">5 - Neutral</div>
                         </div>
-
                         <div class="text-center">
                             <button type="submit" class="w-full bg-pink-600 text-white py-3 rounded-lg bloom-button">
                                 Add Joy Moment
@@ -146,8 +103,6 @@
                         </div>
                     </div>
                 </form>
-
-                <!-- Motivational Quote -->
                 <div id="motivational-quote" class="motivational-quote"></div>
             </div>
         </div>
@@ -155,14 +110,12 @@
         <!-- Joyful Moments Section -->
         <div class="glass-card section-spacing">
             <h2 class="text-2xl font-semibold text-gray-800 text-center mb-4">Your Joyful Moments</h2>
-            <div class="overflow-y-auto h-64"> <!-- Changed from overflow-hidden/relative to scrollable -->
+            <div class="overflow-y-auto h-64">
                 <ul id="joy-list" class="space-y-4">
                     <!-- Joy moments will be dynamically added here -->
                 </ul>
             </div>
         </div>
-
-    
 
         <!-- Your Joy Progress Section -->
         <div class="glass-card section-spacing">
@@ -176,6 +129,7 @@
                 <button onclick="setChartPeriod('monthly')" class="bloom-button">Monthly</button>
             </div>
         </div>
+    </div>
 
     <!-- Footer Section -->
     <footer class="grass">
@@ -204,7 +158,16 @@ const joyLevels = [
 
 function updateSliderValue(slider) {
     const value = slider.value;
-    document.getElementById('slider-description').textContent = `${value} - ${joyLevels[value - 1]}`;
+    document.getElementById('slider-description').textContent = 
+        `${value} - ${joyLevels[value - 1]}`;
+}
+
+function updateJarFill(totalJoy) {
+    const jarFill = document.getElementById('jar-fill');
+    // Set max to 100 for consistent scaling
+    const jarHeight = Math.min((totalJoy / 100) * 100, 100);
+    jarFill.style.height = `${jarHeight}%`;
+    console.log('Updating jar fill to:', jarHeight); // Debug log
 }
 
 function handleFormSubmit(event) {
@@ -223,21 +186,15 @@ function handleFormSubmit(event) {
         body: JSON.stringify({ description, joyLevel })
     })
     .then(response => response.json())
-    .then(data => { // <-- FIXED SYNTAX
+    .then(data => {
         if (data.success) {
-            loadJoyMoments(); // Refresh the list
-            fetchQuote();     // Show a new quote
+            loadJoyMoments();
+            fetchQuote();
         }
     });
 
     document.getElementById('joy-form').reset();
     updateSliderValue(document.getElementById('joy_level'));
-}
-
-function updateJarFill(totalJoy) {
-    const jarFill = document.getElementById('jar-fill');
-    const jarHeight = Math.min((totalJoy / MAX_JOY_LEVEL) * 100, 100);
-    jarFill.style.height = `${jarHeight}%`;
 }
 
 function addJoyMomentToList(description, joyLevel, timestamp) {
@@ -252,26 +209,22 @@ function addJoyMomentToList(description, joyLevel, timestamp) {
 }
 
 function groupJoyData(moments) {
-    // Helper to group by date, week, month
     const daily = {};
     const weekly = {};
     const monthly = {};
 
     moments.forEach(m => {
         const dateObj = new Date(m.timestamp);
-        // Daily
         const day = dateObj.toLocaleDateString();
         daily[day] = daily[day] || { count: 0, totalLevel: 0 };
         daily[day].count += 1;
         daily[day].totalLevel += m.joyLevel;
 
-        // Weekly (ISO week)
         const week = `${dateObj.getFullYear()}-W${getWeekNumber(dateObj)}`;
         weekly[week] = weekly[week] || { count: 0, totalLevel: 0 };
         weekly[week].count += 1;
         weekly[week].totalLevel += m.joyLevel;
 
-        // Monthly
         const month = `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2, '0')}`;
         monthly[month] = monthly[month] || { count: 0, totalLevel: 0 };
         monthly[month].count += 1;
@@ -282,149 +235,11 @@ function groupJoyData(moments) {
 }
 
 function getWeekNumber(d) {
-    // ISO week number
     d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
     const dayNum = d.getUTCDay() || 7;
     d.setUTCDate(d.getUTCDate() + 4 - dayNum);
     const yearStart = new Date(Date.UTC(d.getFullYear(),0,1));
     return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
-}
-
-function renderCharts(moments) {
-    const { daily, weekly, monthly } = groupJoyData(moments);
-
-    // Helper to build chart data
-    function buildChartData(dataObj) {
-        const labels = Object.keys(dataObj);
-        const counts = labels.map(label => dataObj[label].count);
-        const avgs = labels.map(label => (dataObj[label].totalLevel / dataObj[label].count).toFixed(2));
-        return { labels, counts, avgs };
-    }
-
-    // Destroy previous charts if they exist
-    if (window.dailyChartInstance) window.dailyChartInstance.destroy();
-    if (window.weeklyChartInstance) window.weeklyChartInstance.destroy();
-    if (window.monthlyChartInstance) window.monthlyChartInstance.destroy();
-
-    // Daily Chart
-    const dailyData = buildChartData(daily);
-    window.dailyChartInstance = new Chart(document.getElementById('dailyChart'), {
-        type: 'bar',
-        data: {
-            labels: dailyData.labels,
-            datasets: [
-                {
-                    label: 'Joy Moments',
-                    data: dailyData.counts,
-                    backgroundColor: 'rgba(255, 99, 132, 0.7)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 2,
-                    yAxisID: 'y',
-                },
-                {
-                    label: 'Avg Joy Level',
-                    data: dailyData.avgs,
-                    type: 'line',
-                    fill: false,
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    yAxisID: 'y1'
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            animation: { duration: 1200 },
-            plugins: {
-                legend: { display: true },
-                tooltip: { enabled: true }
-            },
-            scales: {
-                y: { beginAtZero: true, title: { display: true, text: 'Joy Moments' } },
-                y1: { beginAtZero: true, position: 'right', title: { display: true, text: 'Avg Joy Level' }, min: 1, max: 10 }
-            }
-        }
-    });
-
-    // Weekly Chart
-    const weeklyData = buildChartData(weekly);
-    window.weeklyChartInstance = new Chart(document.getElementById('weeklyChart'), {
-        type: 'bar',
-        data: {
-            labels: weeklyData.labels,
-            datasets: [
-                {
-                    label: 'Joy Moments',
-                    data: weeklyData.counts,
-                    backgroundColor: 'rgba(255, 206, 86, 0.7)',
-                    borderColor: 'rgba(255, 206, 86, 1)',
-                    borderWidth: 2,
-                    yAxisID: 'y',
-                },
-                {
-                    label: 'Avg Joy Level',
-                    data: weeklyData.avgs,
-                    type: 'line',
-                    fill: false,
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    yAxisID: 'y1'
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            animation: { duration: 1200 },
-            plugins: {
-                legend: { display: true },
-                tooltip: { enabled: true }
-            },
-            scales: {
-                y: { beginAtZero: true, title: { display: true, text: 'Joy Moments' } },
-                y1: { beginAtZero: true, position: 'right', title: { display: true, text: 'Avg Joy Level' }, min: 1, max: 10 }
-            }
-        }
-    });
-
-    // Monthly Chart
-    const monthlyData = buildChartData(monthly);
-    window.monthlyChartInstance = new Chart(document.getElementById('monthlyChart'), {
-        type: 'bar',
-        data: {
-            labels: monthlyData.labels,
-            datasets: [
-                {
-                    label: 'Joy Moments',
-                    data: monthlyData.counts,
-                    backgroundColor: 'rgba(153, 102, 255, 0.7)',
-                    borderColor: 'rgba(153, 102, 255, 1)',
-                    borderWidth: 2,
-                    yAxisID: 'y',
-                },
-                {
-                    label: 'Avg Joy Level',
-                    data: monthlyData.avgs,
-                    type: 'line',
-                    fill: false,
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    yAxisID: 'y1'
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            animation: { duration: 1200 },
-            plugins: {
-                legend: { display: true },
-                tooltip: { enabled: true }
-            },
-            scales: {
-                y: { beginAtZero: true, title: { display: true, text: 'Joy Moments' } },
-                y1: { beginAtZero: true, position: 'right', title: { display: true, text: 'Avg Joy Level' }, min: 1, max: 10 }
-            }
-        }
-    });
 }
 
 let chartPeriod = 'daily';
@@ -458,7 +273,6 @@ function renderJoyProgressChart(moments) {
     const counts = labels.map(label => dataObj[label].count);
     const avgs = labels.map(label => (dataObj[label].totalLevel / dataObj[label].count).toFixed(2));
 
-    // Destroy previous chart
     if (chartInstance) chartInstance.destroy();
 
     chartInstance = new Chart(document.getElementById('joyProgressChart'), {
@@ -497,7 +311,7 @@ function renderJoyProgressChart(moments) {
                 y: {
                     beginAtZero: true,
                     title: { display: true, text: 'Joy Moments' },
-                    suggestedMax: Math.max(...counts) < 5 ? 5 : undefined // auto-scale, but minimum 5 for visibility
+                    suggestedMax: Math.max(...counts) < 5 ? 5 : undefined
                 },
                 y1: {
                     beginAtZero: true,
@@ -511,23 +325,24 @@ function renderJoyProgressChart(moments) {
     });
 }
 
-// Update loadJoyMoments to cache data and render combined chart
 function loadJoyMoments() {
     fetch('/api/joy_moments')
-      .then(response => response.json())
-      .then(moments => {
-          chartDataCache = moments;
-          const joyList = document.getElementById('joy-list');
-          joyList.innerHTML = "";
-          let totalJoy = 0;
-          moments.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-          moments.forEach(moment => {
-              addJoyMomentToList(moment.description, moment.joyLevel, moment.timestamp);
-              totalJoy += moment.joyLevel;
-          });
-          updateJarFill(totalJoy);
-          renderJoyProgressChart(moments);
-      });
+        .then(response => response.json())
+        .then(moments => {
+            console.log('Loaded moments:', moments); // Debug log
+            const joyList = document.getElementById('joy-list');
+            joyList.innerHTML = '';
+            let totalJoy = 0;
+            
+            moments.forEach(moment => {
+                addJoyMomentToList(moment.description, moment.joyLevel, moment.timestamp);
+                totalJoy += moment.joyLevel;
+            });
+            
+            updateJarFill(totalJoy);
+            renderJoyProgressChart(moments);
+        })
+        .catch(error => console.error('Error loading moments:', error));
 }
 
 function fetchQuote() {
@@ -546,8 +361,6 @@ window.onload = function () {
     loadJoyMoments();
     fetchQuote();
 };
-</script>
-
+    </script>
 </body>
-
 </html>

@@ -51,6 +51,8 @@ def setup_database():
     )
     """)
 
+
+
     conn.commit()
     conn.close()
 
@@ -182,6 +184,8 @@ class JoyTracker:
         conn.close()
         return moments
 
+   
+
 # Register function to add new users
 def register():
     conn = sqlite3.connect("joy_tracker.db")
@@ -235,6 +239,49 @@ def get_joy_moments_api():
         {'description': m[1], 'joyLevel': m[2], 'timestamp': m[3] if len(m) > 3 else None} for m in moments
     ])
 
+@app.route('/api/joy_moments', methods=['POST'])
+def add_joy_moment():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'success': False, 'error': 'Not logged in'}), 401
+    
+    data = request.get_json()
+    description = data.get('description')
+    joy_level = data.get('joyLevel')
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    
+    try:
+        conn = sqlite3.connect('joy_tracker.db')
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO joy_moments (user_id, description, joy_level, timestamp)
+            VALUES (?, ?, ?, ?)
+        ''', (user_id, description, joy_level, timestamp))
+        conn.commit()
+        conn.close()
+        return jsonify({'success': True})
+    except Exception as e:
+        print(f"Error saving moment: {e}")  # Debug log
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    
+    conn = sqlite3.connect('joy_tracker.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT id FROM users WHERE username = ? AND password = ?', 
+                  (username, password))
+    user = cursor.fetchone()
+    conn.close()
+    
+    if user:
+        session['user_id'] = user[0]  # Set user_id in session
+        return jsonify({'success': True})
+    return jsonify({'success': False})
+
 # Main workflow
 def main():
     setup_database()
@@ -285,4 +332,4 @@ def main():
             print("Invalid choice or please login first.")
 
 if __name__ == "__main__":
-    main()
+    app.run(debug=True)
